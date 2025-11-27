@@ -1,0 +1,43 @@
+# Cursor Rules
+
+## Project Context
+This project is an AI Video Creator using Google's Veo 3 model for Image-to-Video generation via **Gemini API** with API key authentication.
+
+## Code Style & Conventions
+- **Language**: Python 3.10+
+- **Style Guide**: PEP 8.
+- **Type Hinting**: Use Python type hints (`typing` module) for all function arguments and return values.
+- **Docstrings**: Use Google-style docstrings for all functions and classes.
+- **Error Handling**: Implement robust error handling, especially for API calls (try/except blocks).
+- **Async**: Use synchronous calls for API operations (Gemini API is synchronous).
+
+## Project Structure
+- `/docs`: Documentation files (.md).
+- `/`: Source code files (.py).
+
+## Specific Libraries
+- `google-generativeai`: Official Gemini API SDK (for Veo 3 access).
+- `requests`: For REST API fallback implementation.
+
+## Gemini API Guidelines
+- Always configure `genai.configure(api_key=...)` before using any Gemini API functions.
+- Use API keys from Google AI Studio (https://ai.google.dev), not Vertex AI credentials.
+- Store API keys in environment variables (`GEMINI_API_KEY`), never hardcode them.
+- Handle API errors gracefully (invalid key, rate limits, model not available).
+- The Veo 3 model name is typically `veo-3.0-generate-preview` or similar.
+- Max video duration for Veo 3 is 8 seconds.
+
+## Authentication
+- **Primary Method**: Gemini API Key (from Google AI Studio)
+- **No OAuth Required**: This implementation uses API keys, not OAuth/Service Accounts
+- **Security**: Always use environment variables for API keys, never commit them to git
+
+## Error Handling Patterns
+- Check for file existence before processing
+- Validate API key format/structure
+- Handle both library and REST API methods as fallback
+- Print detailed error messages with traceback for debugging
+- Return `None` on failure, path string on success
+
+## UI/UX Preferences (Frontend Context - if applicable)
+- **Search Bar**: Avoid black backgrounds for search bar UI components. (Memory ID: 2507491)
