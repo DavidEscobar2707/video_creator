@@ -12,9 +12,14 @@ WORKDIR /app
 # Copiar requirements y instalar dependencias de Python
 COPY requirements.txt .
 
-# Actualizar pip y instalar dependencias
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Actualizar pip y setuptools
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Instalar google-generativeai primero para evitar conflictos de namespace
+RUN pip install --no-cache-dir google-generativeai==0.8.3
+
+# Instalar el resto de dependencias
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código de la aplicación
 COPY . .
