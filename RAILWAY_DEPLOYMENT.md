@@ -28,9 +28,11 @@ AIRTABLE_TABLE_NAME=AI_Influencer_Videos
 
 Railway detectará automáticamente el `Dockerfile` y lo usará para el build.
 
-Si necesitas configurar manualmente:
-- Build Command: (vacío, usa Dockerfile)
-- Start Command: `./start.sh`
+**No necesitas configurar nada manualmente.** Railway:
+- Detecta el Dockerfile automáticamente
+- Construye la imagen
+- Expone el puerto usando la variable `$PORT`
+- Ejecuta el comando CMD del Dockerfile
 
 ## Verificación
 
@@ -43,9 +45,10 @@ Click en "View Logs"
 
 Deberías ver:
 ```
-✅ FFmpeg instalado: ffmpeg version 4.x.x
-✅ GEMINI_API_KEY configurada
-🚀 Iniciando servidor...
+INFO:     Started server process
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:XXXX
 ```
 
 ### 2. Probar el Endpoint

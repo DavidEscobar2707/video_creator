@@ -19,10 +19,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar el código de la aplicación
 COPY . .
 
-# Copiar y dar permisos al script de inicio
-COPY start.sh .
-RUN chmod +x start.sh
-
 # Crear directorios necesarios
 RUN mkdir -p data/output data/temp data/references
 
@@ -30,4 +26,4 @@ RUN mkdir -p data/output data/temp data/references
 EXPOSE 8000
 
 # Comando para iniciar la aplicación
-CMD ["./start.sh"]
+CMD ["sh", "-c", "uvicorn src.api:app --host 0.0.0.0 --port ${PORT:-8000}"]
