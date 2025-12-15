@@ -1,51 +1,38 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.egg-info/
-dist/
-build/
-
-# Virtual Environments
+# Environment
 .env
-.venv
-env/
+.venv/
 venv/
-ENV/
-venv.bak/
 veo_env/
+__pycache__/
+*.pyc
+*.pyo
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# Project Specific - Generated Files
+# Data directories
+data/output/
+data/temp/
+data/references/
 output/
 temp/
 references/
-*.mp4
-*.mp3
-*.jpg
-*.jpeg
-*.png
-*.webp
 
-# Keep directory structure
-!references/.gitkeep
-!output/.gitkeep
-!temp/.gitkeep
-
-# Logs
-*.log
+# Assets (keep structure, ignore large files)
+assets/*.mp4
+assets/*.mp3
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Specs (optional)
-.kiro/
+# Logs
+*.log
+
+# Build
+dist/
+build/
+*.egg-info/

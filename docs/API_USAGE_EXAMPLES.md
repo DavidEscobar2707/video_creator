@@ -69,17 +69,31 @@ Body (form-data):
 ```json
 {
   "job_id": "abc123-def456-ghi789",
-  "status": "pending",+65
+  "status": "pending",
   "progress": 0,
   "message": "Character generation started",
   "result_url": null,
+  "result_urls": null,
+  "error": null
+}
+```
+
+**Response (Completed):**
+```json
+{
+  "job_id": "abc123-def456-ghi789",
+  "status": "completed",
+  "progress": 100,
+  "message": "Character face generated successfully",
+  "result_url": "/api/v1/download/abc123-def456-ghi789_face.jpg",
+  "result_urls": null,
   "error": null
 }
 ```
 
 ---
 
-### Ejemplo 2: Generar Video
+### Ejemplo 2: Generar Video (Opción 1: Con archivo subido)
 
 **Request:**
 ```
@@ -90,6 +104,34 @@ Body (form-data):
 - prompt: "Professional influencer showing phone to camera with engaging smile"
 - product_description: "TinyHeroes.ai app - Transform photos with AI magic"
 - character_face: [Upload file: character_face.jpg]
+- aspect_ratio: "9:16"
+- duration_seconds: 8
+```
+
+**Response:**
+```json
+{
+  "job_id": "xyz789-abc123-def456",
+  "status": "pending",
+  "progress": 0,
+  "message": "Video generation started",
+  "result_url": null,
+  "error": null
+}
+```
+
+### Ejemplo 2b: Generar Video (Opción 2: Usando character_job_id)
+
+**Request:**
+```
+POST http://localhost:8000/api/v1/video/generate
+Content-Type: multipart/form-data
+
+Body (form-data):
+- prompt: "Professional influencer showing phone to camera with engaging smile"
+- product_description: "TinyHeroes.ai app - Transform photos with AI magic"
+- character_job_id: "abc123-def456-ghi789"
+- character_image_type: "face"
 - aspect_ratio: "9:16"
 - duration_seconds: 8
 ```
@@ -155,7 +197,7 @@ Binary file download (video.mp4)
 
 ## 💻 Ejemplos con Python
 
-### Ejemplo Completo: Generar Video
+### Ejemplo Completo: Flujo Character + Video
 
 ```python
 import requests
@@ -163,51 +205,63 @@ import time
 
 BASE_URL = "http://localhost:8000"
 
-# 1. Generate video
-with open("references/character_face.jpg", "rb") as f:
-    files = {"character_face": f}
-    data = {
+def poll_job(job_id):
+    """Poll job status until completed or failed."""
+    while True:
+        response = requests.get(f"{BASE_URL}/api/v1/job/{job_id}")
+        status = response.json()
+        
+        print(f"Status: {status['status']} - Progress: {status['progress']}% - {status['message']}")
+        
+        if status["status"] == "completed":
+            return status
+        elif status["status"] == "failed":
+            raise Exception(f"Job failed: {status['error']}")
+        
+        time.sleep(5)
+
+# 1. Generate character face image
+print("🎨 Generating character...")
+response = requests.post(
+    f"{BASE_URL}/api/v1/character/generate",
+    data={"description": "Professional female influencer in her late 20s, warm smile, white sweater"}
+)
+character_job_id = response.json()["job_id"]
+print(f"Character Job ID: {character_job_id}")
+
+# 2. Wait for character generation
+character_result = poll_job(character_job_id)
+print(f"✅ Character generated!")
+print(f"Face: {character_result['result_url']}")
+
+# 3. Generate video using character
+print("\n🎬 Generating video...")
+response = requests.post(
+    f"{BASE_URL}/api/v1/video/generate",
+    data={
         "prompt": "Professional influencer showing phone with engaging smile",
         "product_description": "TinyHeroes.ai - Transform photos with AI",
+        "character_job_id": character_job_id,
+        "character_image_type": "face",  # Use face image
         "aspect_ratio": "9:16",
         "duration_seconds": 8
     }
-    
-    response = requests.post(
-        f"{BASE_URL}/api/v1/video/generate",
-        files=files,
-        data=data
-    )
-    
-    result = response.json()
-    job_id = result["job_id"]
-    print(f"Job ID: {job_id}")
+)
+video_job_id = response.json()["job_id"]
+print(f"Video Job ID: {video_job_id}")
 
-# 2. Poll for status
-while True:
-    response = requests.get(f"{BASE_URL}/api/v1/job/{job_id}")
-    status = response.json()
-    
-    print(f"Status: {status['status']} - Progress: {status['progress']}%")
-    
-    if status["status"] == "completed":
-        print(f"✅ Done! Download: {status['result_url']}")
-        break
-    elif status["status"] == "failed":
-        print(f"❌ Failed: {status['error']}")
-        break
-    
-    time.sleep(5)
+# 4. Wait for video generation
+video_result = poll_job(video_job_id)
+print(f"✅ Video generated!")
 
-# 3. Download video
-if status["status"] == "completed":
-    download_url = f"{BASE_URL}{status['result_url']}"
-    response = requests.get(download_url)
-    
-    with open("downloaded_video.mp4", "wb") as f:
-        f.write(response.content)
-    
-    print("✅ Video downloaded!")
+# 5. Download video
+download_url = f"{BASE_URL}{video_result['result_url']}"
+response = requests.get(download_url)
+
+with open("final_video.mp4", "wb") as f:
+    f.write(response.content)
+
+print("✅ Video downloaded as final_video.mp4!")
 ```
 
 ---
@@ -304,18 +358,20 @@ curl -O "http://localhost:8000/api/v1/download/abc123-def456_video.mp4"
 
 ```
 1. POST /api/v1/character/generate
-   ↓ (Get job_id)
+   ↓ (Get character_job_id)
    
-2. GET /api/v1/job/{job_id} (Poll every 5s)
+2. GET /api/v1/job/{character_job_id} (Poll every 5s)
    ↓ (Wait until status = "completed")
+   ↓ (Get result_url with face image)
    
-3. GET /api/v1/download/{filename}
-   ↓ (Download character image)
+3. (Optional) GET /api/v1/download/{filename}
+   ↓ (Download character face image if needed)
    
-4. POST /api/v1/video/generate (Use downloaded image)
-   ↓ (Get job_id)
+4. POST /api/v1/video/generate
+   ↓ (Use character_job_id)
+   ↓ (Get video_job_id)
    
-5. GET /api/v1/job/{job_id} (Poll every 5s)
+5. GET /api/v1/job/{video_job_id} (Poll every 5s)
    ↓ (Wait until status = "completed")
    
 6. GET /api/v1/download/{filename}

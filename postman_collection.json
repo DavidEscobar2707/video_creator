@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "AI Influencer Video Generator API",
+    "description": "API para generar videos de influencers usando Veo 3.1 e Imagen 4.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Verificar que el servidor está funcionando"
+      },
+      "response": []
+    },
+    {
+      "name": "Character Generation",
+      "item": [
+        {
+          "name": "Generate Character",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "description",
+                  "value": "Professional female influencer in her late 20s, warm smile, white sweater, modern style",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/character/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "character", "generate"]
+            },
+            "description": "Generar imagen de personaje usando Imagen 4.0"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Character Job Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/job/{{character_job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "job", "{{character_job_id}}"]
+            },
+            "description": "Verificar el estado de la generación del personaje"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Character Image",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/download/{{character_job_id}}_face.jpg",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "download", "{{character_job_id}}_face.jpg"]
+            },
+            "description": "Descargar la imagen del personaje generada"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Video Generation",
+      "item": [
+        {
+          "name": "Generate Video (with character_job_id)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "prompt",
+                  "value": "Professional influencer showing phone to camera with engaging smile",
+                  "type": "text"
+                },
+                {
+                  "key": "product_description",
+                  "value": "TinyHeroes.ai app - Transform photos with AI magic",
+                  "type": "text"
+                },
+                {
+                  "key": "character_job_id",
+                  "value": "{{character_job_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "character_image_type",
+                  "value": "face",
+                  "type": "text"
+                },
+                {
+                  "key": "aspect_ratio",
+                  "value": "9:16",
+                  "type": "text"
+                },
+                {
+                  "key": "duration_seconds",
+                  "value": "8",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/video/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "video", "generate"]
+            },
+            "description": "Generar video usando una imagen de personaje generada previamente"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Video (with file upload)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "prompt",
+                  "value": "Professional influencer showing phone to camera with engaging smile",
+                  "type": "text"
+                },
+                {
+                  "key": "product_description",
+                  "value": "TinyHeroes.ai app - Transform photos with AI magic",
+                  "type": "text"
+                },
+                {
+                  "key": "character_face",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "aspect_ratio",
+                  "value": "9:16",
+                  "type": "text"
+                },
+                {
+                  "key": "duration_seconds",
+                  "value": "8",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/video/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "video", "generate"]
+            },
+            "description": "Generar video subiendo una imagen de personaje"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Video Job Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/job/{{video_job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "job", "{{video_job_id}}"]
+            },
+            "description": "Verificar el estado de la generación del video"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Video",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/download/{{video_job_id}}_video.mp4",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "download", "{{video_job_id}}_video.mp4"]
+            },
+            "description": "Descargar el video generado"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Voiceover Generation",
+      "item": [
+        {
+          "name": "Generate Voiceover",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "script",
+                  "value": "Hey everyone! Check out this amazing app that transforms your photos with AI magic. Download TinyHeroes.ai today!",
+                  "type": "text"
+                },
+                {
+                  "key": "language",
+                  "value": "en",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/voiceover/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "voiceover", "generate"]
+            },
+            "description": "Generar audio de voiceover usando text-to-speech"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Voiceover Job Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/job/{{voiceover_job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "job", "{{voiceover_job_id}}"]
+            },
+            "description": "Verificar el estado de la generación del voiceover"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Voiceover",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/download/{{voiceover_job_id}}_voiceover.mp3",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "download", "{{voiceover_job_id}}_voiceover.mp3"]
+            },
+            "description": "Descargar el audio de voiceover generado"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "character_job_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "video_job_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "voiceover_job_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
