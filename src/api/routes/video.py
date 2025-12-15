@@ -110,6 +110,42 @@ async def download_file(filename: str):
     )
 
 
+@router.post("/video/add-subtitles", response_model=JobStatus)
+async def add_subtitles_to_video(
+    background_tasks: BackgroundTasks,
+    video_job_id: str = Form(...),
+    subtitle_text: str = Form(...),
+    subtitle_language: str = Form("en"),
+    font_size: int = Form(24),
+    font_color: str = Form("white")
+):
+    """
+    Add subtitles to a generated video.
+    
+    - **video_job_id**: ID of the generated video
+    - **subtitle_text**: Text for the subtitles
+    - **subtitle_language**: Language code (en, es, fr, etc.)
+    - **font_size**: Font size for subtitles (default: 24)
+    - **font_color**: Font color (white, yellow, etc.)
+    
+    Returns job_id to track progress.
+    """
+    job_id = str(uuid.uuid4())
+    job_manager.create(job_id)
+    
+    background_tasks.add_task(
+        _add_subtitles_task,
+        job_id, video_job_id, subtitle_text, subtitle_language, font_size, font_color
+    )
+    
+    return JobStatus(
+        job_id=job_id,
+        status="pending",
+        progress=0,
+        message="Adding subtitles to video..."
+    )
+
+
 def _generate_video_task(
     job_id: str,
     prompt: str,
@@ -198,3 +234,132 @@ def _generate_video_task(
                 airtable.update_record_status(airtable_record_id, "Failed", str(e))
             except:
                 pass
+
+
+
+def _add_subtitles_task(
+    job_id: str,
+    video_job_id: str,
+    subtitle_text: str,
+    subtitle_language: str,
+    font_size: int,
+    font_color: str
+):
+    """Background task to add subtitles to video."""
+    import subprocess
+    
+    airtable = get_airtable_manager()
+    airtable_record_id = None
+    
+    try:
+        job_manager.update(job_id, status="processing", progress=10, message="Preparing subtitle addition...")
+        
+        # Paths
+        video_path = settings.output_dir / f"{video_job_id}_video.mp4"
+        subtitle_path = settings.temp_dir / f"{job_id}_subtitles.srt"
+        output_path = settings.output_dir / f"{job_id}_video_with_subtitles.mp4"
+        
+        if not video_path.exists():
+            raise Exception(f"Video not found: {video_job_id}")
+        
+        # Create SRT subtitle file
+        job_manager.update(job_id, progress=20, message="Creating subtitle file...")
+        _create_srt_file(subtitle_path, subtitle_text)
+        
+        # Add subtitles using FFmpeg
+        job_manager.update(job_id, progress=50, message="Adding subtitles with FFmpeg...")
+        _add_subtitles_with_ffmpeg(
+            str(video_path), 
+            str(subtitle_path), 
+            str(output_path),
+            font_size,
+            font_color
+        )
+        
+        job_manager.complete(
+            job_id,
+            f"/api/v1/download/{job_id}_video_with_subtitles.mp4",
+            "Subtitles added successfully"
+        )
+        
+        if airtable:
+            try:
+                airtable_record_id = airtable.create_video_record(
+                    job_id=job_id,
+                    prompt=f"Subtitled video from {video_job_id}",
+                    product_description=subtitle_text,
+                    video_path=str(output_path),
+                    character_face_path="",
+                    aspect_ratio="9:16",
+                    duration_seconds=8,
+                    metadata={
+                        "original_video_job_id": video_job_id,
+                        "subtitle_language": subtitle_language,
+                        "subtitle_text": subtitle_text
+                    }
+                )
+            except Exception as e:
+                print(f"Airtable save failed: {e}")
+        
+    except Exception as e:
+        job_manager.fail(job_id, str(e))
+        
+        if airtable and airtable_record_id:
+            try:
+                airtable.update_record_status(airtable_record_id, "Failed", str(e))
+            except:
+                pass
+
+
+def _create_srt_file(output_path: Path, subtitle_text: str):
+    """Create SRT subtitle file."""
+    # Simple SRT format: one subtitle for the entire video duration
+    srt_content = f"""1
+00:00:00,000 --> 00:00:08,000
+{subtitle_text}
+"""
+    
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(srt_content, encoding='utf-8')
+
+
+def _add_subtitles_with_ffmpeg(
+    video_path: str, 
+    subtitle_path: str, 
+    output_path: str,
+    font_size: int = 24,
+    font_color: str = "white"
+):
+    """Add subtitles to video using FFmpeg."""
+    import subprocess
+    
+    # Map color names to hex values for FFmpeg
+    color_map = {
+        "white": "&H00FFFFFF&",
+        "yellow": "&H0000FFFF&",
+        "red": "&H000000FF&",
+        "green": "&H0000FF00&",
+        "blue": "&H00FF0000&",
+        "black": "&H00000000&"
+    }
+    
+    color_hex = color_map.get(font_color.lower(), "&H00FFFFFF&")
+    
+    # Escape the subtitle path for Windows
+    subtitle_path_escaped = subtitle_path.replace('\\', '\\\\').replace(':', '\\:')
+    
+    cmd = [
+        'ffmpeg',
+        '-i', video_path,
+        '-vf', f"subtitles={subtitle_path_escaped}:force_style='FontSize={font_size},PrimaryColour={color_hex},Alignment=2'",
+        '-c:a', 'copy',
+        '-c:v', 'libx264',
+        '-preset', 'medium',
+        '-y',  # Overwrite output file if exists
+        output_path
+    ]
+    
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    if result.returncode != 0:
+        raise Exception(f"FFmpeg error: {result.stderr}")

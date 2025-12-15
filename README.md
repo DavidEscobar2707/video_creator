@@ -29,13 +29,21 @@ Obtén tu API key desde [Google AI Studio](https://ai.google.dev)
 
 ## 📋 Uso
 
-```bash
-# Iniciar servidor API
-python main.py
+### Opción 1: Python directo
 
-# Documentación interactiva
+```bash
+python main.py
 # http://localhost:8000/docs
 ```
+
+### Opción 2: Docker (Recomendado)
+
+```bash
+docker-compose up -d
+# http://localhost:8000/docs
+```
+
+Ver [DOCKER_GUIDE.md](DOCKER_GUIDE.md) para más detalles.
 
 ## 🔌 Endpoints de la API
 
@@ -44,6 +52,7 @@ python main.py
 | `/health` | GET | Health check |
 | `/api/v1/character/generate` | POST | Generar imagen de personaje |
 | `/api/v1/video/generate` | POST | Generar video de influencer |
+| `/api/v1/video/add-subtitles` | POST | Agregar subtítulos a video |
 | `/api/v1/voiceover/generate` | POST | Generar audio de voiceover |
 | `/api/v1/job/{job_id}` | GET | Verificar estado del trabajo |
 | `/api/v1/download/{filename}` | GET | Descargar archivo generado |

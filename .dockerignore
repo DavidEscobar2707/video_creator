@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+veo_env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+
+# Data directories (will be mounted as volumes)
+data/output/
+data/temp/
+data/references/
+output/
+temp/
+references/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Kiro
+.kiro/
+
+# Documentation
+docs/
+
+# Assets
+assets/
+
+# Keep start script
+!start.sh

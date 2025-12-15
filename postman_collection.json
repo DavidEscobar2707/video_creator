@@ -199,6 +199,78 @@
             "description": "Descargar el video generado"
           },
           "response": []
+        },
+        {
+          "name": "Add Subtitles to Video",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "video_job_id",
+                  "value": "{{video_job_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "subtitle_text",
+                  "value": "Check out this amazing app!",
+                  "type": "text"
+                },
+                {
+                  "key": "subtitle_language",
+                  "value": "en",
+                  "type": "text"
+                },
+                {
+                  "key": "font_size",
+                  "value": "24",
+                  "type": "text"
+                },
+                {
+                  "key": "font_color",
+                  "value": "white",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/video/add-subtitles",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "video", "add-subtitles"]
+            },
+            "description": "Agregar subtítulos a un video generado"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Subtitle Job Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/job/{{subtitle_job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "job", "{{subtitle_job_id}}"]
+            },
+            "description": "Verificar el estado de la adición de subtítulos"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Video with Subtitles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/download/{{subtitle_job_id}}_video_with_subtitles.mp4",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "download", "{{subtitle_job_id}}_video_with_subtitles.mp4"]
+            },
+            "description": "Descargar el video con subtítulos"
+          },
+          "response": []
         }
       ]
     },
@@ -283,6 +355,11 @@
     },
     {
       "key": "voiceover_job_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "subtitle_job_id",
       "value": "",
       "type": "string"
     }
