@@ -15,11 +15,14 @@ COPY requirements.txt .
 # Actualizar pip y setuptools
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Instalar google-generativeai primero para evitar conflictos de namespace
-RUN pip install --no-cache-dir google-generativeai==0.8.3
+# Limpiar cualquier instalación previa de google packages
+RUN pip uninstall -y google google-api-core google-auth google-generativeai || true
 
-# Instalar el resto de dependencias
-RUN pip install --no-cache-dir -r requirements.txt
+# Instalar todas las dependencias de una vez (esto resuelve dependencias correctamente)
+RUN pip install --no-cache-dir --force-reinstall -r requirements.txt
+
+# Verificar que google-generativeai se instaló correctamente
+RUN python -c "from google import genai; print('✅ google-generativeai instalado correctamente')"
 
 # Copiar el código de la aplicación
 COPY . .
