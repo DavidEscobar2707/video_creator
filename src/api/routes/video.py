@@ -5,8 +5,8 @@ from pathlib import Path
 from fastapi import APIRouter, BackgroundTasks, Form, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 import requests
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 
 from src.core import settings
 from src.api.schemas import JobStatus

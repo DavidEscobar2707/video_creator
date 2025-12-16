@@ -1,8 +1,8 @@
 """Character reference image generation using Imagen 4.0."""
 from pathlib import Path
 from typing import Optional
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 
 from .config import settings
 
