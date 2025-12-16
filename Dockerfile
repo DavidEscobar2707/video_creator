@@ -24,13 +24,12 @@ COPY . .
 # Crear directorios necesarios
 RUN mkdir -p data/output data/temp data/references
 
-# Copiar entrypoint script
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+# Copiar start script
+COPY start.py /app/start.py
+RUN chmod +x /app/start.py
 
 # Exponer el puerto
 EXPOSE 8000
 
 # Comando para iniciar la aplicación
-# Use Python to read PORT environment variable and start uvicorn
-CMD ["python", "-c", "import os; import uvicorn; port = int(os.environ.get('PORT', 8000)); uvicorn.run('src.api:app', host='0.0.0.0', port=port, workers=1)"]
+CMD ["python", "/app/start.py"]
