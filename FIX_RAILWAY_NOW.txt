@@ -1,0 +1,85 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║           🚨 ACCIÓN REQUERIDA - CONFIGURACIÓN RAILWAY             ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+EL PROBLEMA:
+  Railway está usando un "Start command" personalizado que causa el error:
+  Error: Invalid value for '--port': '$PORT' is not a valid integer.
+
+LA SOLUCIÓN:
+  Eliminar el "Start command" de Railway para que use el Dockerfile
+
+╔════════════════════════════════════════════════════════════════════╗
+║                    PASOS A SEGUIR EN RAILWAY                       ║
+╚════════════════════════════════════════════════════════════════════╝
+
+1. Ve a Railway Dashboard
+   https://railway.app
+
+2. Click en tu proyecto "prueba3"
+
+3. Click en tu servicio
+
+4. Ve a Settings → Deploy
+
+5. Busca "Start Command"
+   Actualmente dice: uvicorn src.api:app --host 0.0.0.0 --port $PORT
+
+6. ELIMINA ese comando (borra todo el texto)
+
+7. Deja el campo VACÍO
+
+8. Click en "Save"
+
+9. Ve a Deployments → Click "Redeploy"
+
+╔════════════════════════════════════════════════════════════════════╗
+║                         QUÉ VA A PASAR                            ║
+╚════════════════════════════════════════════════════════════════════╝
+
+✓ Railway usará el CMD del Dockerfile
+✓ Dockerfile ejecutará: python start.py
+✓ start.py leerá PORT del ambiente correctamente
+✓ uvicorn iniciará en 0.0.0.0:PORT
+✓ La aplicación será accesible
+✓ No más errores 502
+
+╔════════════════════════════════════════════════════════════════════╗
+║                    CONFIGURACIÓN CORRECTA                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+Build:
+  ✓ Builder: Dockerfile
+  ✓ Dockerfile path: /Dockerfile
+
+Deploy:
+  ✓ Start Command: (VACÍO)
+  ✓ Region: us-east4-eqdc4a
+  ✓ Replicas: 1
+  ✓ Restart policy: on failure
+
+Variables:
+  ✓ GEMINI_API_KEY=your-key-here
+
+╔════════════════════════════════════════════════════════════════════╗
+║                         VERIFICACIÓN                              ║
+╚════════════════════════════════════════════════════════════════════╝
+
+Después de redeploy, deberías ver en los logs:
+  INFO:     Uvicorn running on http://0.0.0.0:XXXX
+
+Y tu health check debería funcionar:
+  curl https://your-app.railway.app/health
+
+╔════════════════════════════════════════════════════════════════════╗
+║                    🎯 ACCIÓN INMEDIATA                            ║
+╚════════════════════════════════════════════════════════════════════╝
+
+1. Abre Railway Dashboard
+2. Elimina el "Start Command"
+3. Guarda los cambios
+4. Redeploy
+
+¡Eso es todo! Tu aplicación debería funcionar después de esto.

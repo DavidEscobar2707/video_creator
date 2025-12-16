@@ -24,9 +24,11 @@ COPY . .
 # Crear directorios necesarios
 RUN mkdir -p data/output data/temp data/references
 
+# Copiar start script
+COPY start.py /app/start.py
+
 # Exponer el puerto
 EXPOSE 8000
 
 # Comando para iniciar la aplicación
-# Using shell form to allow environment variable expansion
-CMD python -c "import os; import uvicorn; uvicorn.run('src.api:app', host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), workers=1)"
+CMD ["python", "start.py"]
