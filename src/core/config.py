@@ -35,7 +35,7 @@ class Config(BaseSettings):
     
     # API Settings
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = int(os.environ.get("PORT", 8000))
     
     class Config:
         env_file = ".env"
