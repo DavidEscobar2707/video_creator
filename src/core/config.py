@@ -42,16 +42,15 @@ class Config(BaseSettings):
         env_file_encoding = "utf-8"
         extra = "ignore"
     
+    def __init__(self, **data):
+        """Initialize configuration and setup directories."""
+        super().__init__(**data)
+        self.setup_directories()
+    
     def setup_directories(self) -> None:
         """Create required directories."""
         for directory in [self.output_dir, self.temp_dir, self.references_dir]:
             directory.mkdir(parents=True, exist_ok=True)
-    
-    def validate_api_key(self) -> bool:
-        """Validate that Gemini API key is configured."""
-        if not self.gemini_api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment variables")
-        return True
     
     @property
     def airtable_enabled(self) -> bool:

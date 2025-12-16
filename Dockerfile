@@ -15,18 +15,8 @@ COPY requirements.txt .
 # Actualizar pip
 RUN pip install --no-cache-dir --upgrade pip
 
-# Instalar dependencias una por una para evitar conflictos
-RUN pip install --no-cache-dir google-generativeai==0.8.3 && \
-    pip install --no-cache-dir requests==2.31.0 && \
-    pip install --no-cache-dir python-dotenv==1.0.1 && \
-    pip install --no-cache-dir gtts==2.5.0 && \
-    pip install --no-cache-dir Pillow==10.4.0 && \
-    pip install --no-cache-dir fastapi==0.115.0 && \
-    pip install --no-cache-dir "uvicorn[standard]==0.32.0" && \
-    pip install --no-cache-dir pydantic==2.9.2 && \
-    pip install --no-cache-dir pydantic-settings==2.6.0 && \
-    pip install --no-cache-dir python-multipart==0.0.12 && \
-    pip install --no-cache-dir pyairtable==2.3.3
+# Instalar dependencias
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código de la aplicación
 COPY . .
