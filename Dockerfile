@@ -32,4 +32,5 @@ RUN chmod +x /app/entrypoint.sh
 EXPOSE 8000
 
 # Comando para iniciar la aplicación
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Use Python to read PORT environment variable and start uvicorn
+CMD ["python", "-c", "import os; import uvicorn; port = int(os.environ.get('PORT', 8000)); uvicorn.run('src.api:app', host='0.0.0.0', port=port, workers=1)"]
