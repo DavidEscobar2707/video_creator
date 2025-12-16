@@ -6,14 +6,23 @@ All errors have been identified and fixed. The application is now ready for depl
 ## Issues Fixed
 
 ### 1. ✅ Docker PORT Environment Variable Handling
-**Problem**: Dockerfile was hardcoding port 8000, but Railway uses the `$PORT` environment variable.
+**Problem**: Dockerfile was hardcoding port 8000, but Railway uses the `$PORT` environment variable. Shell variable expansion in CMD doesn't work properly.
 
-**Solution**: Updated Dockerfile CMD to use environment variable with fallback:
-```dockerfile
-CMD ["sh", "-c", "uvicorn src.api:app --host 0.0.0.0 --port ${PORT:-8000}"]
+**Solution**: Created `entrypoint.sh` script to properly handle PORT variable expansion:
+```bash
+#!/bin/bash
+PORT=${PORT:-8000}
+exec uvicorn src.api:app --host 0.0.0.0 --port $PORT
 ```
 
-**File**: `Dockerfile`
+Updated Dockerfile to use ENTRYPOINT:
+```dockerfile
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
+```
+
+**Files**: `Dockerfile`, `entrypoint.sh` (new)
 
 ### 2. ✅ Google Generative AI Import Fixed
 **Problem**: Initial error was `ImportError: cannot import name 'genai' from 'google'` due to namespace conflict.
@@ -112,10 +121,11 @@ CMD ["sh", "-c", "uvicorn src.api:app --host 0.0.0.0 --port ${PORT:-8000}"]
 
 ## Files Modified
 
-1. **Dockerfile** - Fixed PORT environment variable handling
-2. **src/core/character.py** - Fixed google.generativeai import
-3. **src/core/video.py** - Fixed google.generativeai import
-4. **src/api/routes/video.py** - Fixed google.generativeai import
+1. **Dockerfile** - Updated to use entrypoint script for PORT handling
+2. **entrypoint.sh** (NEW) - Script to properly handle PORT environment variable
+3. **src/core/character.py** - Fixed google.generativeai import
+4. **src/core/video.py** - Fixed google.generativeai import
+5. **src/api/routes/video.py** - Fixed google.generativeai import
 
 ## Next Steps
 

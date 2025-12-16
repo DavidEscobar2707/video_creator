@@ -10,8 +10,8 @@ All errors have been resolved. The application is fully tested and ready for dep
 
 ### 1. Docker PORT Environment Variable
 - **Issue**: Dockerfile hardcoded port 8000, but Railway uses `$PORT` environment variable
-- **Fix**: Updated CMD to: `CMD ["sh", "-c", "uvicorn src.api:app --host 0.0.0.0 --port ${PORT:-8000}"]`
-- **Result**: ✅ Application now respects Railway's PORT assignment
+- **Fix**: Created `entrypoint.sh` script to properly handle PORT variable expansion
+- **Result**: ✅ Application now respects Railway's PORT assignment with proper shell variable expansion
 
 ### 2. Google Generative AI Import Error
 - **Issue**: `ImportError: cannot import name 'genai' from 'google'` - namespace conflict

@@ -24,8 +24,12 @@ COPY . .
 # Crear directorios necesarios
 RUN mkdir -p data/output data/temp data/references
 
+# Copiar entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Exponer el puerto
 EXPOSE 8000
 
 # Comando para iniciar la aplicación
-CMD ["sh", "-c", "uvicorn src.api:app --host 0.0.0.0 --port ${PORT:-8000}"]
+ENTRYPOINT ["/app/entrypoint.sh"]
