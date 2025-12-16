@@ -9,20 +9,24 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copiar requirements y instalar dependencias de Python
+# Copiar requirements
 COPY requirements.txt .
 
-# Actualizar pip y setuptools
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+# Actualizar pip
+RUN pip install --no-cache-dir --upgrade pip
 
-# Limpiar cualquier instalación previa de google packages
-RUN pip uninstall -y google google-api-core google-auth google-generativeai || true
-
-# Instalar todas las dependencias de una vez (esto resuelve dependencias correctamente)
-RUN pip install --no-cache-dir --force-reinstall -r requirements.txt
-
-# Verificar que google-generativeai se instaló correctamente
-RUN python -c "from google import genai; print('✅ google-generativeai instalado correctamente')"
+# Instalar dependencias una por una para evitar conflictos
+RUN pip install --no-cache-dir google-generativeai==0.8.3 && \
+    pip install --no-cache-dir requests==2.31.0 && \
+    pip install --no-cache-dir python-dotenv==1.0.1 && \
+    pip install --no-cache-dir gtts==2.5.0 && \
+    pip install --no-cache-dir Pillow==10.4.0 && \
+    pip install --no-cache-dir fastapi==0.115.0 && \
+    pip install --no-cache-dir "uvicorn[standard]==0.32.0" && \
+    pip install --no-cache-dir pydantic==2.9.2 && \
+    pip install --no-cache-dir pydantic-settings==2.6.0 && \
+    pip install --no-cache-dir python-multipart==0.0.12 && \
+    pip install --no-cache-dir pyairtable==2.3.3
 
 # Copiar el código de la aplicación
 COPY . .
