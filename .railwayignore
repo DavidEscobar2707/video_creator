@@ -1,0 +1,47 @@
+# Railway ignore file
+# Prevent Railway from auto-detecting start commands
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Ignore virtual environments
+venv/
+.venv/
+veo_env/
+ENV/
+env/
+
+# Ignore local data
+data/
+output/
+temp/
+references/
+assets/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore documentation
+docs/
+*.md
+!README.md
+
+# Ignore test files
+test_*.py
+*_test.py
+tests/
+
+# Ignore local env
+.env
+.env.local
